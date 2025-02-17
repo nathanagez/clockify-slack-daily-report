@@ -15,7 +15,7 @@ line-length = 120
 
 [lint]
 select = ["ALL"]
-ignore = ["D417", "D100", "D101", "D102", "D103", "D103", "D103", "D104", "D105", "D106", "D107", "COM812", "I252", "FA102", "FA100"]
+ignore = ["D417", "D100", "D101", "D102", "D103", "D103", "D103", "D104", "D105", "D106", "D107", "COM812", "TID252", "FA102", "FA100"]
 
 [lint.pydocstyle]
 convention = "google"
