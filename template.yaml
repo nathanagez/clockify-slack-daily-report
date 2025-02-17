@@ -1,0 +1,66 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: clockify-slack-daily-report
+
+Parameters:
+  Owner:
+    Type: String
+    Default: Nathan Agez
+  Project:
+    Type: String
+    Default: Clockify Daily Standup Report
+  Name:
+    Type: String
+    Default: Clockify
+  ClockifyApiEndpoint:
+    Type: String
+  SlackApiEndpoint:
+    Type: String
+  SlackDestinationChannel:
+    Type: String
+
+Globals: # https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-specification-template-anatomy-globals.html
+  Function:
+    Timeout: 180
+    MemorySize: 128
+    Runtime: python3.12
+    Layers:
+      - !Ref Layer
+    Tags:
+      Project: !Ref Project
+      Owner: !Ref Owner
+      Name: !Ref Name
+
+Resources:
+  Layer:
+    Type: AWS::Serverless::LayerVersion
+    Properties:
+      LayerName: !Sub "${AWS::StackName}-layer"
+      Description: Common, Clockify and Slack shared lib used by Lambdas
+      ContentUri: ./src/layer
+      CompatibleRuntimes:
+        - python3.12
+      RetentionPolicy: Delete
+    Metadata:
+      BuildMethod: python3.12
+
+  GenerateReportFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: main.lambda_handler
+      CodeUri: ./src/generate-report/app
+      Description: Find time entries from Clockify and generate a report before sending it to the Slack channel
+      Policies:
+        - AWSSecretsManagerGetSecretValuePolicy:
+            SecretArn: !Sub "arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:${AWS::StackName}-iconik-*"
+      Environment:
+        Variables:
+          CLOCKIFY_API_ENDPOINT: "REPLACE"
+          CLOCKIFY_CREDENTIALS_KEY: "REPLACE"
+      Events:
+        Cron:
+          Type: ScheduleV2
+          Properties:
+            ScheduleExpression: 'cron(0 0 * * ? *)' # Everyday at 00:00:00 (UTC+02:00)
+            Name: !Sub "${AWS::StackName}-cron"
+            Description: Daily retrieval of time entries from Clockify and generation of a report

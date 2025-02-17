@@ -1,0 +1,3 @@
+pydantic
+aws-lambda-powertools
+requests

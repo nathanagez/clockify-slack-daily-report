@@ -1,0 +1,32 @@
+# Rules https://docs.astral.sh/ruff/rules/
+exclude = [
+    ".git",
+    ".mypy_cache",
+    ".pytype",
+    ".ruff_cache",
+    ".venv",
+    "build",
+    "dist",
+    "node_modules",
+    "venv",
+]
+
+line-length = 120
+
+[lint]
+select = ["ALL"]
+ignore = ["D417", "D100", "D101", "D102", "D103", "D103", "D103", "D104", "D105", "D106", "D107", "COM812", "I252", "FA102", "FA100"]
+
+[lint.pydocstyle]
+convention = "google"
+
+[lint.per-file-ignores]
+"__init__.py" = ["E402"]
+"**/{tests,docs,tools}/*" = ["E402", "S101", "ANN201", "ANN001", "ARG002"]
+
+
+[format]
+docstring-code-format = true
+indent-style = "space"
+quote-style = "double"
+line-ending = "auto"
